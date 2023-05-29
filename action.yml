@@ -1,0 +1,30 @@
+name: 'My Custom Github Action'
+description: 'This github action may change through time, so currently it is unknown what the end result will be.'
+inputs:
+  num:
+    desceription: 'Enter a number'
+    required: true
+    default: "1"
+outputs:
+  num_squared:
+    description: "Returns the square of the supplied number"
+    # need to specify the extra `value` field for `composite` actions
+    value: ${{ steps.get-square.outputs.num_squared }}
+runs:
+  using: 'composite'
+  steps:
+    - name: Install Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    - name: Install Dependencies
+      run: pip install - r requirements.txt
+      shell: bash
+    - name: Pass inputs to Shell
+      run: |
+              echo "INPUT_NUM=${{ inputs.num }}" >> $GITHUB_ENV
+      shell: bash
+    - name: Fetch the number's square
+      id: get-square
+      run: python src/get_num_square.py
+      shell: bash
